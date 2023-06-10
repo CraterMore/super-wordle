@@ -13350,7 +13350,6 @@ function generateScore(win, tilesLeft) {
     }
   }
   score = output.trimEnd()
-  //console.log(score)
 }
 
 function copyScore() {
