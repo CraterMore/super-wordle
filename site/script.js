@@ -12984,6 +12984,7 @@ const statsWindow = document.getElementById("stats-subwindow")
 const loadWindow = document.getElementById("load-subwindow")
 const scoreOne = document.getElementById("bar1")
 const statContainer = document.getElementById("stat-container")
+const gamesStat = document.getElementById("games-played")
 var targetWord = ""
 // Date initialization
 var dateAPI = new Date()
@@ -13062,6 +13063,7 @@ async function updateStats(dbInfo) {
     child.lastElementChild.lastElementChild.style.width = (graphMinPercent + ((dbInfo[score.toString()].length / maxLength) * (100 - graphMinPercent))).toString() + "%";
     score++;
   }
+  gamesStat.innerHTML = "Games Played: " + dbInfo["gamesPlayed"]
   return
 }
 

@@ -18,7 +18,7 @@ body {
 .dialog-window {
   border: none;
   width: 100vmin;
-  height: 100vmin;
+  height: fit-content;
   background-color: #272727;
   color: white;
 }
