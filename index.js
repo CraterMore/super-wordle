@@ -122,6 +122,13 @@ app.post("/api/db", async function(req, res) {
 })
 
 // Send database information to client
+app.post("/api/logout", async function(req, res) {
+  res.clearCookie("REPL_AUTH", { domain: `.${req.hostname}` })
+  res.redirect("back")
+  return
+})
+
+// Send database information to client
 app.post("/writeGameProgress", async function(req, res) {
   var dateAPI = new Date()
   var today =

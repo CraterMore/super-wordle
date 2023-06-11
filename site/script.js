@@ -12982,6 +12982,7 @@ const guessGrid = document.querySelector("[data-guess-grid]")
 const submissionTitle = document.querySelector("[data-game-header]")
 const statsWindow = document.getElementById("stats-subwindow")
 const loadWindow = document.getElementById("load-subwindow")
+const aboutWindow = document.getElementById("about-subwindow")
 const scoreOne = document.getElementById("bar1")
 const statContainer = document.getElementById("stat-container")
 const gamesStat = document.getElementById("games-played")
@@ -13289,7 +13290,7 @@ function getActiveTiles() {
 function openStats() {
   stopInteraction()
   if (score != "") {
-    statsWindow.lastElementChild.style.visibility = "visible";
+    statsWindow.querySelector("#share").style.visibility = "visible";
   }
   statsWindow.showModal()
 }
@@ -13300,6 +13301,26 @@ function closeStats() {
   if (score == "") {
     startInteraction()
   }
+}
+
+// Open about window
+function openAbout() {
+  stopInteraction()
+  aboutWindow.showModal()
+}
+
+// Close about window
+function closeAbout() {
+  aboutWindow.close()
+}
+
+// Logout current user
+function logoutUser() {
+  fetch("/api/logout", {
+    method: 'POST',
+  })
+  alert("Please refresh the page to continue.")
+  return
 }
 
 // Update user db info to save game progress
