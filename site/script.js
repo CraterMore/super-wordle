@@ -13290,7 +13290,7 @@ function getActiveTiles() {
 function openStats() {
   stopInteraction()
   if (score != "") {
-    statsWindow.lastElementChild.style.visibility = "visible";
+    statsWindow.querySelector("#share").style.visibility = "visible";
   }
   statsWindow.showModal()
 }
@@ -13309,12 +13309,9 @@ function openAbout() {
   aboutWindow.showModal()
 }
 
-// Close about window, restore interaction
+// Close about window
 function closeAbout() {
   aboutWindow.close()
-  if (score == "") {
-    startInteraction()
-  }
 }
 
 // Logout current user
