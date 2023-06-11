@@ -16,6 +16,25 @@
     <h1 style="text-align:center;">Loading...</h1>
     <p style="text-align:center; visibility:hidden;">If this takes more than a few seconds refresh the page!</p>
   </dialog>
+  <dialog id="about-subwindow" class="dialog-window">
+    <img onclick="closeAbout()" style="max-height: 5vmin; max-width:5vmin;" src="/site/images/exit.png"></img>
+    <h1 style="color:White; text-align:center;">Super Wordle</h1>
+    <div style="display: flex; flex-direction: column; align-items: center">
+      <label style="font-size: 1.3em;"><b>Created by:</b></label>
+      <p style="margin: 0.5em 0 1.3em;">Carter Moore</p>
+      <label style="font-size: 1.3em;"><b>Base Game:</b></label>
+      <p style="margin: 0.5em 0 1.3em;">WebDevSimplified</p>
+      <label style="font-size: 1.3em;"><b>Special Thanks:</b></label>
+      <p style="margin: 0.5em 0 1.3em; text-align: center;">Idea - Poppa<br>Testing - Ava, Mom & Dad</p>
+      <p style="margin: 0.5em 0 1.3em;">v1.0.0 <button onclick="logoutUser()" style="
+        margin: 0 auto;
+        border: none;
+        color: #818181;
+        display: inline;
+        font-size: 1em;
+        background-color: rgba(0, 0, 0, 0);"><u>Logout</u></button></p>
+    </div>
+  </dialog>
   <dialog id="stats-subwindow" class="dialog-window">
     <img onclick="closeStats()" style="max-height: 5vmin; max-width:5vmin;" src="/site/images/exit.png"></img>
     <h1 style="color:White; text-align:center;">Your Statistics</h1>
@@ -60,6 +79,13 @@
       margin: 0px auto;
       visibility: hidden;
 ">Share Score</button>
+    <button onclick="openAbout()" style="
+      margin: 0 auto;
+      border: none;
+      color: #818181;
+      display: block;
+      background-color: rgba(0, 0, 0, 0);
+      "><u>About</u></button>
   </dialog>
   <div class="option-buttons">
     <a href="https://wordle-family.cartermoore4.repl.co/submit" style="display: block;"><img src="/site/images/submit.png"></img></a>
