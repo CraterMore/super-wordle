@@ -13091,6 +13091,12 @@ async function getTargetWord() {
   const subBody = await subRes.json()
 
   if (subBody[today]) {
+    var userID = dbInfo.id
+    if (subBody[today][2] == userID) {
+      targetWord = body.solution
+      setSubmitterTitle("the New York Times")
+      alert("You submitted today's word. Here is the normal daily word instead!")
+    }
     targetWord = subBody[today][0];
     author = subBody[today][1];
     setSubmitterTitle(subBody[today][1])
