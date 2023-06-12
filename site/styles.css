@@ -3,6 +3,13 @@
   font-family: Arial;
 }
 
+:root {
+  --gradient: linear-gradient(90deg,
+    hsl(204, 100%, 69%),
+    hsl(273, 61%, 62%)
+  )
+}
+
 body {
   background-color: hsl(240, 3%, 7%);
   display: flex;
@@ -283,6 +290,12 @@ body {
   align-items: center;
 }
 
+@keyframes animateAuthor {
+  0%: {background-size: 100%;}
+  50%: {background-size: 300%;}
+  100%: {background-size: 100%;}
+}
+
 .submitter {
   pointer-events: none;
   background-color: hsl(204, 100%, 69%);
@@ -292,6 +305,9 @@ body {
   transition: opacity 500ms ease-in-out;
   margin-bottom: .5em;
   text-align: center;
+  /*background-image: var(--gradient);*/
+  /*background-size: 200%;*/
+  /*animation: animateAuthor 3s infinite;*/
 }
 
 .menu-button {

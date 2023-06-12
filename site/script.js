@@ -13073,6 +13073,12 @@ function setSubmitterTitle(author) {
   const title = document.createElement("div")
   title.innerHTML = "Today's word is from <b>" + author + "</b>"
   title.classList.add("submitter")
+  if (author != "the New York Times") {
+    title.style["background-image"] = "var(--gradient)"
+    //title.style["background-size"] = "300%"
+    //title.style["background-position"] = "left"
+    //title.style.animation = "animateAuthor 3s infinite"
+  }
   submissionTitle.prepend(title)
 }
 
