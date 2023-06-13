@@ -13032,7 +13032,7 @@ async function loadGame() {
     method: "POST"
   })
   dbInfo = await dbRes.json()
-  await getTargetWord()
+  await getTargetWord(dbInfo)
   setupBoard(dbInfo)
 }
 
@@ -13083,7 +13083,7 @@ function setSubmitterTitle(author) {
 }
 
 // Set target word
-async function getTargetWord() {
+async function getTargetWord(dbInfo) {
   const res = await fetch("/api/solution?today=" + today)
   const body = await res.json();
 
@@ -13091,15 +13091,20 @@ async function getTargetWord() {
   const subBody = await subRes.json()
 
   if (subBody[today]) {
-    var userID = dbInfo.id
-    if (subBody[today][2] == userID) {
+    var userRes = await fetch("/api/getID", {
+      method: "POST"
+    })
+    var userID = await userRes.json()
+    if (subBody[today][2] == userID.id) {
       targetWord = body.solution
       setSubmitterTitle("the New York Times")
-      alert("You submitted today's word. Here is the normal daily word instead!")
+      showAlert("You submitted today's word. Here is the normal daily word instead!", 6000)
+      return
+    } else {
+      targetWord = subBody[today][0];
+      author = subBody[today][1];
+      setSubmitterTitle(subBody[today][1])
     }
-    targetWord = subBody[today][0];
-    author = subBody[today][1];
-    setSubmitterTitle(subBody[today][1])
   } else {
     targetWord = body.solution
     setSubmitterTitle("the New York Times")
