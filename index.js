@@ -121,6 +121,18 @@ app.post("/api/db", async function(req, res) {
   })
 })
 
+// Send user info to client
+app.post("/api/getID", async function(req, res) {
+  var userInfo = getUserInfo(req)
+  //var userID = req.query.id;
+
+  if (!userInfo) {
+    res.json("Could not find user info!")
+    return
+  }
+  res.send(userInfo);
+})
+
 // Send database information to client
 app.post("/api/logout", async function(req, res) {
   res.clearCookie("REPL_AUTH", { domain: `.${req.hostname}` })

@@ -14,14 +14,35 @@ var maxSubmit =
   String(dateAPI.getMonth() + 1).padStart(2, '0') + '-' +
   String(dateAPI.getDate() + 8).padStart(2, '0')*/
 
+checkAuth()
+
+async function checkAuth() {
+  try {
+    var dbInfo;
+    const dbRes = await fetch("/api/db", {
+      method: "POST"
+    })
+    dbInfo = await dbRes.json()
+  } catch {
+    window.location.replace("https://wordle-family.cartermoore4.repl.co");
+  }
+}
+
 // Try Submitting
 // -------------------------
 function submitWord() {
-  console.log("Attempted submission from button press")
   submitButton.disabled = true
   var word = word_box.value
-  var rawDate = $("#date-box").datepicker("getDate")
-  const puzzleDate = rawDate.toISOString().substring(0,10)
+  var rawDate
+  var puzzleDate
+  try {
+    rawDate = $("#date-box").datepicker("getDate")
+    puzzleDate = rawDate.toISOString().substring(0,10)
+  } catch {
+    alert("You must choose a date to continue.")
+    submitButton.disabled = false
+    return
+  }
   var author = author_box.value
 
   if (word.length != 5) {
