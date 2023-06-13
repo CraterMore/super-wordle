@@ -28,6 +28,8 @@ function submitWord() {
     alert("Word must be 5 letters in length.")
   } else if (author.length <= 2) {
     alert("Name must be 3 characters or more.")
+  } else if (author.length > 30) {
+    alert("Name must be less than 30 characters.")
   } else {
     writeSubmission(puzzleDate, word, author)
   }

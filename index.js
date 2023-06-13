@@ -57,10 +57,10 @@ app.get('/site/images/exit.png', function(req, res) {
 });
 app.use('/site/images/exit.png', router);
 
-app.get('/site/images/logo.png', function(req, res) {
-  res.sendFile(path.join(__dirname, '/site/images/logo.png'));
+app.get('/site/images/logoWhite.png', function(req, res) {
+  res.sendFile(path.join(__dirname, '/site/images/logoWhite.png'));
 });
-app.use('/site/images/logo.png', router);
+app.use('/site/images/logoWhite.png', router);
 
 app.use(bodyParser.json());
 
@@ -171,7 +171,13 @@ router.get("/api/submissions", async function(req, res) {
 // Write puzzle to submissions json
 app.post("/writePuzzle", async function(req, res) {
   var data = req.body;
-  const userID = getUserInfo(req).id
+  const userInfo = getUserInfo(req)
+  var userID
+  if (!userInfo) {
+    userID = ""
+  } else {
+    userID = userInfo.id
+  }
 
   fs.readFile("./submissions.json", "utf8", (err, jsonString) => {
     if (err) {

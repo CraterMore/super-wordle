@@ -8,8 +8,8 @@
     <script     src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js">
     </script>
     <script src="https://replit.com/public/js/repl-auth-v2.js"></script>
-    <title>SuperWordle</title>
-    <link rel="icon" href="/site/images/logo.png">
+    <title>Your Wordle</title>
+    <link rel="icon" href="/site/images/logoWhite.png">
 </head>
 <body>
   <dialog id="load-subwindow" class="load-window">
@@ -18,11 +18,16 @@
   </dialog>
   <dialog id="about-subwindow" class="dialog-window">
     <img onclick="closeAbout()" style="max-height: 5vmin; max-width:5vmin;" src="/site/images/exit.png"></img>
-    <h1 style="color:White; text-align:center;">Super Wordle</h1>
+    <div style="display: flex; margin: 0 auto 1em; width: fit-content; height: fit-content;">
+      <img src="/site/images/logoWhite.png" style="
+        height: 10dvmin;
+        margin: 0 0.5em 0 0;"></img>
+      <label style="color:White; font-size:1.7em; margin: auto 0.2em;"><b>Your Wordle</b></label>
+    </div>
     <div style="display: flex; flex-direction: column; align-items: center">
       <label style="font-size: 1.3em;"><b>Created by:</b></label>
       <p style="margin: 0.5em 0 1.3em;">Carter Moore</p>
-      <label style="font-size: 1.3em;"><b>Base Game:</b></label>
+      <label style="font-size: 1.3em;"><b>Contribution:</b></label>
       <p style="margin: 0.5em 0 1.3em;">WebDevSimplified</p>
       <label style="font-size: 1.3em;"><b>Special Thanks:</b></label>
       <p style="margin: 0.5em 0 1.3em; text-align: center;">Idea - Poppa<br>Testing - Ava, Mom & Dad</p>
@@ -38,7 +43,7 @@
   <dialog id="stats-subwindow" class="dialog-window">
     <img onclick="closeStats()" style="max-height: 5vmin; max-width:5vmin;" src="/site/images/exit.png"></img>
     <h1 style="color:White; text-align:center;">Your Statistics</h1>
-    <label id="games-played" style="text-align: left; width: 80%; font-size: 1.2em; margin: 0px 10%;">Games Played:</label>
+    <label id="games-played" style="display: block; text-align: center; font-size: 1.2em;">Games Played:</label>
     <div id="stat-container" style="height: 35vmin; margin: 5vmin 0px;">
       <div class="stat-space">
         <label>1</label>
