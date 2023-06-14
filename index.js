@@ -133,14 +133,14 @@ app.post("/api/getID", async function(req, res) {
   res.send(userInfo);
 })
 
-// Send database information to client
+// Clear REPL_AUTH cookie on client aka logout
 app.post("/api/logout", async function(req, res) {
   res.clearCookie("REPL_AUTH", { domain: `.${req.hostname}` })
   res.redirect("back")
   return
 })
 
-// Send database information to client
+// Write game progress to Replit Database
 app.post("/writeGameProgress", async function(req, res) {
   var dateAPI = new Date()
   var today =
@@ -178,6 +178,11 @@ app.post("/writeGameProgress", async function(req, res) {
 // Send submission json to client
 router.get("/api/submissions", async function(req, res) {
   res.sendFile(path.join(__dirname, '/submissions.json'))
+})
+
+// Send dictionary json to client
+router.get("/api/dictionary", async function(req, res) {
+  res.sendFile(path.join(__dirname, '/dictionary.json'))
 })
 
 // Write puzzle to submissions json

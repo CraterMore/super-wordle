@@ -16,6 +16,7 @@ var maxSubmit =
 
 checkAuth()
 
+// Check if user is authenticated, else redirect home
 async function checkAuth() {
   try {
     var dbInfo;
