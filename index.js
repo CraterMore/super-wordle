@@ -185,6 +185,11 @@ router.get("/api/dictionary", async function(req, res) {
   res.sendFile(path.join(__dirname, '/dictionary.json'))
 })
 
+// Send targetWords json to client
+router.get("/api/targetWords", async function(req, res) {
+  res.sendFile(path.join(__dirname, '/targetWords.json'))
+})
+
 // Write puzzle to submissions json
 app.post("/writePuzzle", async function(req, res) {
   var data = req.body;

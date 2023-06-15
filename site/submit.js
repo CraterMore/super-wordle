@@ -58,15 +58,33 @@ function submitWord() {
   submitButton.disabled = false
 }
 
+async function checkIfTarget(word) {
+  var res = await fetch("/api/targetWords", {
+    method: 'GET',})
+  var data = await res.json()
+  
+  if (!(data.includes(word))) {
+    if (confirm("The word you're trying to submit is either the plural form of a word, profane, or otherwise uncommon. Are you sure you want to submit?") == false) {
+      return false;
+    } else {
+      return true;
+    }
+  } else {
+    return true;
+  }
+}
+
 // Submit Words
 // -------------------------
-function writeSubmission (date, word, author) {
+async function writeSubmission (date, word, author) {
+  isTarget = await checkIfTarget(word)
+  if (!isTarget) {return}
   
   var sub = {}
   sub.date = date
   sub.word_name = [word.toLowerCase(), author]
 
-  fetch("/writePuzzle", {
+  await fetch("/writePuzzle", {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
