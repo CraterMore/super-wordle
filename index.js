@@ -142,12 +142,7 @@ app.post("/api/logout", async function(req, res) {
 
 // Write game progress to Replit Database
 app.post("/writeGameProgress", async function(req, res) {
-  var dateAPI = new Date()
-  var today =
-    dateAPI.getFullYear() + '-' +
-    String(dateAPI.getMonth() + 1).padStart(2, '0') + '-' +
-    String(dateAPI.getDate()).padStart(2, '0');
-  
+  var today = req.body.date
   var newGuess = req.body.word
   const userID = getUserInfo(req).id
 

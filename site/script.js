@@ -84,14 +84,16 @@ async function updateStats(dbInfo) {
     maxLength = 1;
   }
 
+  statsWindow.showModal()
+  var statFontSize = ((scoreOne.offsetHeight * 0.9).toString()) + "px"
   for (const child of statContainer.children) {
-    let fontSize = (child.offsetHeight * 0.9).toString() + "px"
-    child.lastElementChild.lastElementChild.style["font-size"] = fontSize
-    child.firstElementChild.style["font-size"] = fontSize
+    child.lastElementChild.lastElementChild.style["font-size"] = statFontSize
+    child.firstElementChild.style["font-size"] = statFontSize
   }
   
   var cleanWidth = scoreOne.offsetWidth
   var graphMinPercent = cleanWidth / scoreOne.parentElement.offsetWidth * 100;
+  statsWindow.close()
   var score = 1
   for (const child of statContainer.children) {
     if (dbInfo[score.toString()].includes(today)) {
@@ -384,7 +386,7 @@ function postGuess (guess) {
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({"word": guess, "target": targetWord})
+    body: JSON.stringify({"word": guess, "target": targetWord, "date": today})
   })
   return
 }

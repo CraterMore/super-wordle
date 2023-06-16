@@ -63,7 +63,7 @@ async function checkIfTarget(word) {
     method: 'GET',})
   var data = await res.json()
   
-  if (!(data.includes(word))) {
+  if (!(data.includes(word.toLowerCase()))) {
     if (confirm("The word you're trying to submit is either the plural form of a word, profane, or otherwise uncommon. Are you sure you want to submit?") == false) {
       return false;
     } else {
