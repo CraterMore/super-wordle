@@ -9,6 +9,8 @@ var bodyParser = require('body-parser')
 const Database = require("@replit/database")
 const db = new Database()
 
+const maintenance = false;
+
 const dbTemplate = {
   "1": [],
   "2": [],
@@ -61,6 +63,11 @@ app.get('/site/images/logoWhite.png', function(req, res) {
   res.sendFile(path.join(__dirname, '/site/images/logoWhite.png'));
 });
 app.use('/site/images/logoWhite.png', router);
+
+app.get('/site/images/maintenance.png', function(req, res) {
+  res.sendFile(path.join(__dirname, '/site/images/maintenance.png'));
+});
+app.use('/site/images/maintenance.png', router);
 
 app.use(bodyParser.json());
 
@@ -241,15 +248,39 @@ app.use('/', router);
 //Navigate your website
 //if they go to '/lol'
 router.get('/', async function(req, res) {
-  res.sendFile(path.join(__dirname, '/site/index.html'));
+  var userInfo = getUserInfo(req)
+  if (maintenance) {
+    if (((userInfo) && (userInfo.id == "9226743")) || (!userInfo)) {
+      res.sendFile(path.join(__dirname, '/site/index.html'));
+    } else {
+      res.sendFile(path.join(__dirname, '/site/maintenance.html'));
+    }
+  } else {
+    res.sendFile(path.join(__dirname, '/site/index.html'));
+  }
 });
 
 router.get('/lol', function(req, res) {
   res.sendFile(path.join(__dirname, '/lol.html'));
 });
 app.use('/lol', router);
+
+router.get('/maintenance', function(req, res) {
+  res.sendFile(path.join(__dirname, '/site/maintenance.html'));
+});
+app.use('/maintenance', router);
+
 router.get('/submit', function(req, res) {
-  res.sendFile(path.join(__dirname, '/site/submit.html'));
+  var userInfo = getUserInfo(req)
+  if (maintenance) {
+    if (((userInfo) && (userInfo.id == "9226743")) || (!userInfo)) {
+      res.sendFile(path.join(__dirname, '/site/submit.html'));
+    } else {
+      res.sendFile(path.join(__dirname, '/site/maintenance.html'));
+    }
+  } else {
+    res.sendFile(path.join(__dirname, '/site/submit.html'));
+  }
 });
 app.use('/submit', router);
 //404 Error

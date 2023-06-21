@@ -14,6 +14,7 @@ const scoreOne = document.getElementById("bar1")
 const statContainer = document.getElementById("stat-container")
 const gamesStat = document.getElementById("games-played")
 var targetWord = ""
+var openedStats = false
 // Date initialization
 var dateAPI = new Date()
 var dateStart = new Date("06/19/2021")
@@ -84,7 +85,9 @@ async function updateStats(dbInfo) {
     maxLength = 1;
   }
 
-  statsWindow.showModal()
+  if (!statsWindow.open) {
+    statsWindow.showModal()
+  }
   var statFontSize = ((scoreOne.offsetHeight * 0.9).toString()) + "px"
   for (const child of statContainer.children) {
     child.lastElementChild.lastElementChild.style["font-size"] = statFontSize
@@ -93,7 +96,9 @@ async function updateStats(dbInfo) {
   
   var cleanWidth = scoreOne.offsetWidth
   var graphMinPercent = cleanWidth / scoreOne.parentElement.offsetWidth * 100;
-  statsWindow.close()
+  if (!openedStats) {
+    statsWindow.close()
+  }
   var score = 1
   for (const child of statContainer.children) {
     if (dbInfo[score.toString()].includes(today)) {
@@ -344,6 +349,7 @@ function getActiveTiles() {
 
 // Open stats window, display data
 function openStats() {
+  openedStats = true
   stopInteraction()
   if (score != "") {
     statsWindow.querySelector("#share").style.visibility = "visible";
@@ -353,6 +359,7 @@ function openStats() {
 
 // Close stats window, restore interaction
 function closeStats() {
+  openedStats = false
   statsWindow.close()
   if (score == "") {
     startInteraction()
@@ -380,14 +387,30 @@ function logoutUser() {
 }
 
 // Update user db info to save game progress
-function postGuess (guess) {
-  fetch("/writeGameProgress", {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({"word": guess, "target": targetWord, "date": today})
-  })
+async function postGuess (guess) {
+  try {
+    var response = await Promise.race([
+      fetch("/writeGameProgress", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({"word": guess, "target": targetWord, "date": today})
+      }),
+      new Promise((_, reject) => {setTimeout(
+        () => reject(new Error('Timeout')),
+        10000)}
+      ),
+    ])
+  } catch (e) {
+    if (e.message === 'Timeout' 
+      || e.message === 'Network request failed') {
+      console.log(e.message)
+      setTimeout(() => postGuess(guess), 200)
+    } else {
+      throw e; // rethrow other unexpected errors
+    }
+  }
   return
 }
 
