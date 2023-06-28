@@ -22,6 +22,24 @@ var today =
   dateAPI.getFullYear() + '-' +
   String(dateAPI.getMonth() + 1).padStart(2, '0') + '-' +
   String(dateAPI.getDate()).padStart(2, '0')
+var tomorrow = new Date(dateAPI)
+tomorrow.setDate(tomorrow.getDate() + 1)
+var tomorrowString =
+  tomorrow.getFullYear() + '-' +
+  String(tomorrow.getMonth() + 1).padStart(2, '0') + '-' +
+  String(tomorrow.getDate()).padStart(2, '0')
+var tomorrow2 = new Date(dateAPI)
+tomorrow2.setDate(tomorrow2.getDate() + 2)
+var tomorrow2String =
+  tomorrow2.getFullYear() + '-' +
+  String(tomorrow2.getMonth() + 1).padStart(2, '0') + '-' +
+  String(tomorrow2.getDate()).padStart(2, '0')
+var tomorrow3 = new Date(dateAPI)
+tomorrow3.setDate(tomorrow3.getDate() + 3)
+var tomorrow3String =
+  tomorrow3.getFullYear() + '-' +
+  String(tomorrow3.getMonth() + 1).padStart(2, '0') + '-' +
+  String(tomorrow3.getDate()).padStart(2, '0')
 var daysSince = Math.floor((dateAPI.getTime() - dateStart.getTime()) / (1000 * 3600 * 24))
 var author = null;
 score = "";
@@ -152,6 +170,11 @@ async function getTargetWord(dbInfo) {
   } else {
     targetWord = body.solution
     setSubmitterTitle("the New York Times")
+  }
+  if (!((subBody[tomorrowString]) || (subBody[tomorrow2String]) || (subBody[tomorrow3String]))) {
+    setTimeout(() => {
+      showAlert("Have a word in mind? There are no words submitted for the next three days!", 6000)
+    }, "2000")
   }
   return
 }

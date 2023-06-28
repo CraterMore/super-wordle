@@ -29,10 +29,10 @@ app.get('/site/styles.css', function(req, res) {
 });
 app.use('/site/styles.css', router);
 
-app.get('/site/script.js', function(req, res) {
-  res.sendFile(path.join(__dirname, '/site/script.js'));
+app.get('/site/main.js', function(req, res) {
+  res.sendFile(path.join(__dirname, '/site/main.js'));
 });
-app.use('/site/script.js', router);
+app.use('/site/main.js', router);
 
 app.get('/site/submit.js', function(req, res) {
   res.sendFile(path.join(__dirname, '/site/submit.js'));
