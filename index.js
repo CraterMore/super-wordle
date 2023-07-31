@@ -1,4 +1,3 @@
-const { getUserInfo } = require("@replit/repl-auth")
 const express = require("express");//Set up the express module
 const app = express();
 const router = express.Router();
@@ -21,6 +20,77 @@ const dbTemplate = {
   "gamesPlayed": 0,
   "lastPlay": []
 }
+
+const expressSession = require("express-session");
+const passport = require("passport");
+const Auth0Strategy = require("passport-auth0");
+const authRouter = require("./auth");
+
+// Session Config
+
+const session = {
+  secret: process.env.SESSION_SECRET,
+  cookie: {},
+  resave: false,
+  saveUninitialized: false
+};
+
+if (app.get("env") === "production") {
+  // Serve secure cookies, requires HTTPS
+  session.cookie.secure = true;
+}
+
+app.use(express.static(path.join(__dirname, "site")));
+
+app.use(expressSession(session));
+
+passport.use(Auth0Strategy);
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+
+passport.deserializeUser((user, done) => {
+  done(null, user);
+});
+
+// Passport Config
+
+const strategy = new Auth0Strategy(
+  {
+    domain: process.env.AUTH0_DOMAIN,
+    clientID: process.env.AUTH0_CLIENT_ID,
+    clientSecret: process.env.AUTH0_CLIENT_SECRET,
+    callbackURL: process.env.AUTH0_CALLBACK_URL
+  },
+  function(accessToken, refreshToken, extraParams, profile, done) {
+    /**
+     * Access tokens are used to authorize users to an API
+     * (resource server)
+     * accessToken is the token to call the Auth0 API
+     * or a secured third-party API
+     * extraParams.id_token has the JSON Web Token
+     * profile has all the information from the user
+     */
+    return done(null, profile);
+  }
+);
+
+// Creating custom middleware with Express
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.isAuthenticated();
+  next();
+});
+
+const secured = (req, res, next) => {
+  if (req.user) {
+    return next();
+  }
+  req.session.returnTo = req.originalUrl;
+  res.redirect("/login");
+};
 
 //Set up the Express router
 
@@ -86,34 +156,15 @@ app.get("/api/solution", async function(req, res) {
   }
 })
 
-// Send Replit user information to client
-app.get("/__replauthuser", async function(req, res) {
-  console.log("DID WE EVEN CALL THIS THING")
-  fs.readFile("/__replauthuser", "utf8", (err, jsonString) => {
-    if (err) {
-      res.json("Error reading file from disk:", err);
-      return;
-    }
-    console.log("We are reading repl auth")
-    var obj = jsonString
-    console.log(obj)})
-  
-  if (getUserInfo(req) == null) {
-    res.clearCookie("REPL_AUTH", { domain: `.${req.hostname}` })
-    res.redirect(303, "/")
-    return
-  }
-  res.sendFile(path.join(__dirname, '/__replauthuser'))
-})
-
 // Send database information to client
 app.post("/api/db", async function(req, res) {
   var userInfo = getUserInfo(req)
   //var userID = req.query.id;
 
+  // Force logout if no retrievable data
   if (!userInfo) {
     console.log("We asked for a redirect")
-    res.clearCookie("REPL_AUTH", { domain: `.${req.hostname}` })
+    res.clearCookie("REPL_AUTH", { domain: `.${req.hostname}` }) // WRONG COOKIE
     res.redirect("back")
     return
   }
@@ -243,21 +294,21 @@ app.post("/writePuzzle", async function(req, res) {
 })
 
 
-app.use('/', router);
+app.use('/', authRouter);
 
 //Navigate your website
 //if they go to '/lol'
-router.get('/', async function(req, res) {
-  var userInfo = getUserInfo(req)
+router.get('/', secured, async function(req, res) {
+  /*var userInfo = getUserInfo(req)
   if (maintenance) {
     if (((userInfo) && (userInfo.id == "9226743")) || (!userInfo)) {
       res.sendFile(path.join(__dirname, '/site/index.html'));
     } else {
       res.sendFile(path.join(__dirname, '/site/maintenance.html'));
     }
-  } else {
+  } else {*/
     res.sendFile(path.join(__dirname, '/site/index.html'));
-  }
+  //}
 });
 
 router.get('/lol', function(req, res) {
@@ -291,6 +342,6 @@ app.use(function(req, res, next) {
 
 
 //set up the Express server to listen on port 3000 and logs some messages when the server is ready
-let server = app.listen(3000, function() {
-  console.log("App server is running on port 3000");
+let server = app.listen(8000, function() {
+  console.log("App server is running on port 8000");
 });
