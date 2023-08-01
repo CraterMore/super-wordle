@@ -24,7 +24,8 @@ const dbTemplate = {
 const expressSession = require("express-session");
 const passport = require("passport");
 const Auth0Strategy = require("passport-auth0");
-const authRouter = require("./auth");
+
+const authRouter = require("./auth.js");
 
 // Session Config
 
@@ -40,24 +41,7 @@ if (app.get("env") === "production") {
   session.cookie.secure = true;
 }
 
-app.use(express.static(path.join(__dirname, "site")));
-
-app.use(expressSession(session));
-
-passport.use(Auth0Strategy);
-app.use(passport.initialize());
-app.use(passport.session());
-
-passport.serializeUser((user, done) => {
-  done(null, user);
-});
-
-passport.deserializeUser((user, done) => {
-  done(null, user);
-});
-
 // Passport Config
-
 const strategy = new Auth0Strategy(
   {
     domain: process.env.AUTH0_DOMAIN,
@@ -78,19 +62,46 @@ const strategy = new Auth0Strategy(
   }
 );
 
+// App Config
+
+//app.use(express.static(path.join(__dirname, "site")));
+
+app.use(expressSession(session));
+
+passport.use(strategy);
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+
+passport.deserializeUser((user, done) => {
+  done(null, user);
+});
+
 // Creating custom middleware with Express
 app.use((req, res, next) => {
   res.locals.isAuthenticated = req.isAuthenticated();
   next();
 });
 
+app.use('/', authRouter, router);
+
 const secured = (req, res, next) => {
+  console.log("Verifying user is logged in")
   if (req.user) {
     return next();
   }
   req.session.returnTo = req.originalUrl;
+  console.log("Redirecting for login")
   res.redirect("/login");
 };
+
+// Get User Info
+function getUserInfo(req) {
+  return req.user;
+}
 
 //Set up the Express router
 
@@ -165,7 +176,7 @@ app.post("/api/db", async function(req, res) {
   if (!userInfo) {
     console.log("We asked for a redirect")
     res.clearCookie("REPL_AUTH", { domain: `.${req.hostname}` }) // WRONG COOKIE
-    res.redirect("back")
+    res.redirect("/login")
     return
   }
   var userID = userInfo.id
@@ -192,11 +203,11 @@ app.post("/api/getID", async function(req, res) {
 })
 
 // Clear REPL_AUTH cookie on client aka logout
-app.post("/api/logout", async function(req, res) {
+/*app.post("/api/logout", async function(req, res) {
   res.clearCookie("REPL_AUTH", { domain: `.${req.hostname}` })
   res.redirect("back")
   return
-})
+})*/
 
 // Write game progress to Replit Database
 app.post("/writeGameProgress", async function(req, res) {
@@ -293,22 +304,19 @@ app.post("/writePuzzle", async function(req, res) {
   });
 })
 
-
-app.use('/', authRouter);
-
 //Navigate your website
 //if they go to '/lol'
-router.get('/', secured, async function(req, res) {
-  /*var userInfo = getUserInfo(req)
+router.get('/', secured, async function(req, res, next) {
+  var userInfo = getUserInfo(req)
   if (maintenance) {
-    if (((userInfo) && (userInfo.id == "9226743")) || (!userInfo)) {
+    if (userInfo.id == "google-oauth2|115200778782447743119") {
       res.sendFile(path.join(__dirname, '/site/index.html'));
     } else {
       res.sendFile(path.join(__dirname, '/site/maintenance.html'));
     }
-  } else {*/
+  } else {
     res.sendFile(path.join(__dirname, '/site/index.html'));
-  //}
+  }
 });
 
 router.get('/lol', function(req, res) {
@@ -321,10 +329,10 @@ router.get('/maintenance', function(req, res) {
 });
 app.use('/maintenance', router);
 
-router.get('/submit', function(req, res) {
+router.get('/submit', secured, function(req, res) {
   var userInfo = getUserInfo(req)
   if (maintenance) {
-    if (((userInfo) && (userInfo.id == "9226743")) || (!userInfo)) {
+    if (userInfo.id == "google-oauth2|115200778782447743119") {
       res.sendFile(path.join(__dirname, '/site/submit.html'));
     } else {
       res.sendFile(path.join(__dirname, '/site/maintenance.html'));
@@ -339,7 +347,6 @@ app.use(function(req, res, next) {
   res.status(404);
   res.sendFile(__dirname + '/404.html');
 });
-
 
 //set up the Express server to listen on port 3000 and logs some messages when the server is ready
 let server = app.listen(8000, function() {

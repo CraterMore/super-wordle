@@ -14,10 +14,10 @@ var maxSubmit =
   String(dateAPI.getMonth() + 1).padStart(2, '0') + '-' +
   String(dateAPI.getDate() + 8).padStart(2, '0')*/
 
-checkAuth()
+//checkAuth()
 
 // Check if user is authenticated, else redirect home
-async function checkAuth() {
+/*async function checkAuth() {
   try {
     var dbInfo;
     const dbRes = await fetch("/api/db", {
@@ -27,7 +27,7 @@ async function checkAuth() {
   } catch {
     window.location.replace("https://wordle-family.cartermoore4.repl.co");
   }
-}
+}*/
 
 // Try Submitting
 // -------------------------
