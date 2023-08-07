@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" type="text/css" href="/site/styles.css">
+    <script     src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js">         </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+    <script>
+    $( function() {
+      $( "#date-box" ).datepicker();
+      /*$( "#date-box" ).datepicker( "option", "dateFormat", "yy-mm-dd");*/
+      $( "#date-box" ).datepicker( "option", "minDate", "+1d");
+      $( "#date-box" ).datepicker( "option", "maxDate", "+8d");
+      
+    } );
+    </script>
+    <title>Submit a Word</title>
+    <link rel="icon" href="/site/images/logoWhite.png">
+  </head>
+<body>
+  <div class="option-buttons" style="position: inherit;">
+    <a href="https://wordle-family.cartermoore4.repl.co/demo" style="display: block;"><img src="/site/images/home.png"></img></a>
+  </div>
+  <div class="alert-container" data-alert-container></div>
+  <h1 style="color:White; text-align: center;"}>Submit your word here!</h1><br>
+    <label style="color:White;" for="date-box">Puzzle Date:</label>
+    <input id="date-box" type="text" readonly="true" style="font-size:16px;"><br>
+    <label style="color:White;" for="word-box">Word Submission:</label>
+    <input type="text" id="word-box" maxlength=5 style="font-size:16px;"><br> 
+    <label style="color:White;" for="author-box">Your Name:</label>
+    <input type="text" id="author-box" style="font-size:16px;"><br> 
+    <button type="submit" onclick="submitWord()" id="submit-button">Submit Puzzle</button><br>
+</body>
+  <script src="/site/demo-sub.js"> </script>
+</html>

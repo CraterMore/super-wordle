@@ -120,6 +120,16 @@ app.get('/site/submit.js', function(req, res) {
 });
 app.use('/site/submit.js', router);
 
+app.get('/site/demo.js', function(req, res) {
+  res.sendFile(path.join(__dirname, '/site/demo.js'));
+});
+app.use('/site/demo.js', router);
+
+app.get('/site/demo-sub.js', function(req, res) {
+  res.sendFile(path.join(__dirname, '/site/demo-sub.js'));
+});
+app.use('/site/demo-sub.js', router);
+
 app.get('/site/images/submit.png', function(req, res) {
   res.sendFile(path.join(__dirname, '/site/images/submit.png'));
 });
@@ -306,16 +316,20 @@ app.post("/writePuzzle", async function(req, res) {
 
 //Navigate your website
 //if they go to '/lol'
-router.get('/', secured, async function(req, res, next) {
-  var userInfo = getUserInfo(req)
-  if (maintenance) {
-    if (userInfo.id == "google-oauth2|115200778782447743119") {
-      res.sendFile(path.join(__dirname, '/site/index.html'));
+router.get('/', async function(req, res, next) {
+  if (req.isAuthenticated()) {
+    var userInfo = getUserInfo(req)
+    if (maintenance) {
+      if (userInfo.id == "google-oauth2|115200778782447743119") {
+        res.sendFile(path.join(__dirname, '/site/index.html'));
+      } else {
+        res.sendFile(path.join(__dirname, '/site/maintenance.html'));
+      }
     } else {
-      res.sendFile(path.join(__dirname, '/site/maintenance.html'));
+      res.sendFile(path.join(__dirname, '/site/index.html'));
     }
   } else {
-    res.sendFile(path.join(__dirname, '/site/index.html'));
+    res.redirect('/welcome');
   }
 });
 
@@ -342,6 +356,22 @@ router.get('/submit', secured, function(req, res) {
   }
 });
 app.use('/submit', router);
+
+router.get('/welcome', function(req, res) {
+  res.sendFile(path.join(__dirname, '/site/welcome.html'));
+});
+app.use('/welcome', router);
+
+router.get('/demo', function(req, res) {
+  res.sendFile(path.join(__dirname, '/site/demo.html'));
+});
+app.use('/demo', router);
+
+router.get('/demo/submit', function(req, res) {
+  res.sendFile(path.join(__dirname, '/site/demo-sub.html'));
+});
+app.use('/demo/submit', router);
+
 //404 Error
 app.use(function(req, res, next) {
   res.status(404);
