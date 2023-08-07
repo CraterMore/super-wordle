@@ -1,4 +1,3 @@
-const { getUserInfo } = require("@replit/repl-auth")
 const express = require("express");//Set up the express module
 const app = express();
 const router = express.Router();
@@ -22,6 +21,88 @@ const dbTemplate = {
   "lastPlay": []
 }
 
+const expressSession = require("express-session");
+const passport = require("passport");
+const Auth0Strategy = require("passport-auth0");
+
+const authRouter = require("./auth.js");
+
+// Session Config
+
+const session = {
+  secret: process.env.SESSION_SECRET,
+  cookie: {},
+  resave: false,
+  saveUninitialized: false
+};
+
+if (app.get("env") === "production") {
+  // Serve secure cookies, requires HTTPS
+  session.cookie.secure = true;
+}
+
+// Passport Config
+const strategy = new Auth0Strategy(
+  {
+    domain: process.env.AUTH0_DOMAIN,
+    clientID: process.env.AUTH0_CLIENT_ID,
+    clientSecret: process.env.AUTH0_CLIENT_SECRET,
+    callbackURL: process.env.AUTH0_CALLBACK_URL
+  },
+  function(accessToken, refreshToken, extraParams, profile, done) {
+    /**
+     * Access tokens are used to authorize users to an API
+     * (resource server)
+     * accessToken is the token to call the Auth0 API
+     * or a secured third-party API
+     * extraParams.id_token has the JSON Web Token
+     * profile has all the information from the user
+     */
+    return done(null, profile);
+  }
+);
+
+// App Config
+
+//app.use(express.static(path.join(__dirname, "site")));
+
+app.use(expressSession(session));
+
+passport.use(strategy);
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+
+passport.deserializeUser((user, done) => {
+  done(null, user);
+});
+
+// Creating custom middleware with Express
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.isAuthenticated();
+  next();
+});
+
+app.use('/', authRouter, router);
+
+const secured = (req, res, next) => {
+  console.log("Verifying user is logged in")
+  if (req.user) {
+    return next();
+  }
+  req.session.returnTo = req.originalUrl;
+  console.log("Redirecting for login")
+  res.redirect("/login");
+};
+
+// Get User Info
+function getUserInfo(req) {
+  return req.user;
+}
+
 //Set up the Express router
 
 app.get('/site/styles.css', function(req, res) {
@@ -38,6 +119,16 @@ app.get('/site/submit.js', function(req, res) {
   res.sendFile(path.join(__dirname, '/site/submit.js'));
 });
 app.use('/site/submit.js', router);
+
+app.get('/site/demo.js', function(req, res) {
+  res.sendFile(path.join(__dirname, '/site/demo.js'));
+});
+app.use('/site/demo.js', router);
+
+app.get('/site/demo-sub.js', function(req, res) {
+  res.sendFile(path.join(__dirname, '/site/demo-sub.js'));
+});
+app.use('/site/demo-sub.js', router);
 
 app.get('/site/images/submit.png', function(req, res) {
   res.sendFile(path.join(__dirname, '/site/images/submit.png'));
@@ -86,35 +177,16 @@ app.get("/api/solution", async function(req, res) {
   }
 })
 
-// Send Replit user information to client
-app.get("/__replauthuser", async function(req, res) {
-  console.log("DID WE EVEN CALL THIS THING")
-  fs.readFile("/__replauthuser", "utf8", (err, jsonString) => {
-    if (err) {
-      res.json("Error reading file from disk:", err);
-      return;
-    }
-    console.log("We are reading repl auth")
-    var obj = jsonString
-    console.log(obj)})
-  
-  if (getUserInfo(req) == null) {
-    res.clearCookie("REPL_AUTH", { domain: `.${req.hostname}` })
-    res.redirect(303, "/")
-    return
-  }
-  res.sendFile(path.join(__dirname, '/__replauthuser'))
-})
-
 // Send database information to client
 app.post("/api/db", async function(req, res) {
   var userInfo = getUserInfo(req)
   //var userID = req.query.id;
 
+  // Force logout if no retrievable data
   if (!userInfo) {
     console.log("We asked for a redirect")
-    res.clearCookie("REPL_AUTH", { domain: `.${req.hostname}` })
-    res.redirect("back")
+    res.clearCookie("REPL_AUTH", { domain: `.${req.hostname}` }) // WRONG COOKIE
+    res.redirect("/login")
     return
   }
   var userID = userInfo.id
@@ -141,11 +213,11 @@ app.post("/api/getID", async function(req, res) {
 })
 
 // Clear REPL_AUTH cookie on client aka logout
-app.post("/api/logout", async function(req, res) {
+/*app.post("/api/logout", async function(req, res) {
   res.clearCookie("REPL_AUTH", { domain: `.${req.hostname}` })
   res.redirect("back")
   return
-})
+})*/
 
 // Write game progress to Replit Database
 app.post("/writeGameProgress", async function(req, res) {
@@ -242,21 +314,22 @@ app.post("/writePuzzle", async function(req, res) {
   });
 })
 
-
-app.use('/', router);
-
 //Navigate your website
 //if they go to '/lol'
-router.get('/', async function(req, res) {
-  var userInfo = getUserInfo(req)
-  if (maintenance) {
-    if (((userInfo) && (userInfo.id == "9226743")) || (!userInfo)) {
-      res.sendFile(path.join(__dirname, '/site/index.html'));
+router.get('/', async function(req, res, next) {
+  if (req.isAuthenticated()) {
+    var userInfo = getUserInfo(req)
+    if (maintenance) {
+      if (userInfo.id == "google-oauth2|115200778782447743119") {
+        res.sendFile(path.join(__dirname, '/site/index.html'));
+      } else {
+        res.sendFile(path.join(__dirname, '/site/maintenance.html'));
+      }
     } else {
-      res.sendFile(path.join(__dirname, '/site/maintenance.html'));
+      res.sendFile(path.join(__dirname, '/site/index.html'));
     }
   } else {
-    res.sendFile(path.join(__dirname, '/site/index.html'));
+    res.redirect('/welcome');
   }
 });
 
@@ -270,10 +343,10 @@ router.get('/maintenance', function(req, res) {
 });
 app.use('/maintenance', router);
 
-router.get('/submit', function(req, res) {
+router.get('/submit', secured, function(req, res) {
   var userInfo = getUserInfo(req)
   if (maintenance) {
-    if (((userInfo) && (userInfo.id == "9226743")) || (!userInfo)) {
+    if (userInfo.id == "google-oauth2|115200778782447743119") {
       res.sendFile(path.join(__dirname, '/site/submit.html'));
     } else {
       res.sendFile(path.join(__dirname, '/site/maintenance.html'));
@@ -283,14 +356,29 @@ router.get('/submit', function(req, res) {
   }
 });
 app.use('/submit', router);
+
+router.get('/welcome', function(req, res) {
+  res.sendFile(path.join(__dirname, '/site/welcome.html'));
+});
+app.use('/welcome', router);
+
+router.get('/demo', function(req, res) {
+  res.sendFile(path.join(__dirname, '/site/demo.html'));
+});
+app.use('/demo', router);
+
+router.get('/demo/submit', function(req, res) {
+  res.sendFile(path.join(__dirname, '/site/demo-sub.html'));
+});
+app.use('/demo/submit', router);
+
 //404 Error
 app.use(function(req, res, next) {
   res.status(404);
   res.sendFile(__dirname + '/404.html');
 });
 
-
 //set up the Express server to listen on port 3000 and logs some messages when the server is ready
-let server = app.listen(3000, function() {
-  console.log("App server is running on port 3000");
+let server = app.listen(8000, function() {
+  console.log("App server is running on port 8000");
 });

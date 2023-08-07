@@ -402,10 +402,7 @@ function closeAbout() {
 
 // Logout current user
 function logoutUser() {
-  fetch("/api/logout", {
-    method: 'POST',
-  })
-  alert("Please refresh the page to continue.")
+  window.location.href = "https://wordle-family.cartermoore4.repl.co/logout"
   return
 }
 
