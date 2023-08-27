@@ -79,7 +79,7 @@ async function loadGame() {
   dictionary = await dictRes.json()
   var dbInfo;
   const dbRes = await fetch("/api/db", {
-    method: "POST"
+    method: "GET"
   })
   dbInfo = await dbRes.json()
   await getTargetWord(dbInfo)
@@ -154,7 +154,7 @@ async function getTargetWord(dbInfo) {
 
   if (subBody[today]) {
     var userRes = await fetch("/api/getID", {
-      method: "POST"
+      method: "GET"
     })
     var userID = await userRes.json()
     if (subBody[today][2] == userID.id) {
@@ -183,7 +183,7 @@ async function getTargetWord(dbInfo) {
 async function getUserInfo() {
   var dbInfo;
   const dbRes = await fetch("/api/db", {
-    method: "POST"
+    method: "GET"
   })
   dbInfo = await dbRes.json()
   return dbInfo
@@ -410,8 +410,8 @@ function logoutUser() {
 async function postGuess (guess) {
   try {
     var response = await Promise.race([
-      fetch("/writeGameProgress", {
-        method: 'POST',
+      fetch("/api/db", {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },

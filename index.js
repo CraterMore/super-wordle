@@ -178,32 +178,29 @@ app.get("/api/solution", async function(req, res) {
 })
 
 // Send database information to client
-app.post("/api/db", async function(req, res) {
+app.get("/api/db", async function(req, res) {
   var userInfo = getUserInfo(req)
-  //var userID = req.query.id;
 
   // Force logout if no retrievable data
   if (!userInfo) {
     console.log("We asked for a redirect")
-    res.clearCookie("REPL_AUTH", { domain: `.${req.hostname}` }) // WRONG COOKIE
     res.redirect("/login")
     return
   }
   var userID = userInfo.id
   db.get(userID).then(value => {
-    if (!value) {
+    if (!value) { // Create entry for account with template data
       db.set(userID, dbTemplate)
       res.send(dbTemplate)
-    } else {
+    } else { // Send database data
       res.send(value)
     }
   })
 })
 
 // Send user info to client
-app.post("/api/getID", async function(req, res) {
+app.get("/api/getID", async function(req, res) {
   var userInfo = getUserInfo(req)
-  //var userID = req.query.id;
 
   if (!userInfo) {
     res.json("Could not find user info!")
@@ -212,15 +209,8 @@ app.post("/api/getID", async function(req, res) {
   res.send(userInfo);
 })
 
-// Clear REPL_AUTH cookie on client aka logout
-/*app.post("/api/logout", async function(req, res) {
-  res.clearCookie("REPL_AUTH", { domain: `.${req.hostname}` })
-  res.redirect("back")
-  return
-})*/
-
 // Write game progress to Replit Database
-app.post("/writeGameProgress", async function(req, res) {
+app.put("/api/db", async function(req, res) {
   var today = req.body.date
   var newGuess = req.body.word
   const userID = getUserInfo(req).id
